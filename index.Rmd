@@ -113,7 +113,7 @@ MMQ_Estrella <- tapply(Estrella, format(Tempdate, format="%m"),FUN=sum)
 corinp <- cor(inp[,2:3], method= "spearman")
 ```
 
-### Para finalizar creamos un modelo que predice el caudal del Río Banano con relación al río Estrella.
+### Para finalizar crearemos un modelo que predice el caudal del Río Banano con relación al río Estrella.
 
 ```{r duodecimo paso, }
 inp.lm <- lm(inp[,2] ~ inp[,3], data=inp)

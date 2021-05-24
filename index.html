@@ -285,8 +285,8 @@ MMQ_Estrella &lt;- tapply(Estrella, format(Tempdate, format=&quot;%m&quot;),FUN=
 <h3>En este caso se utilizara el de spearman.</h3>
 <pre class="r"><code>corinp &lt;- cor(inp[,2:3], method= &quot;spearman&quot;)</code></pre>
 </div>
-<div id="para-finalizar-creamos-un-modelo-que-predice-el-caudal-del-río-banano-con-relación-al-río-estrella." class="section level3">
-<h3>Para finalizar creamos un modelo que predice el caudal del Río Banano con relación al río Estrella.</h3>
+<div id="para-finalizar-crearemos-un-modelo-que-predice-el-caudal-del-río-banano-con-relación-al-río-estrella." class="section level3">
+<h3>Para finalizar crearemos un modelo que predice el caudal del Río Banano con relación al río Estrella.</h3>
 <pre class="r"><code>inp.lm &lt;- lm(inp[,2] ~ inp[,3], data=inp)
 summary(inp.lm)</code></pre>
 <pre><code>## 
