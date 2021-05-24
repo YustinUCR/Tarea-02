@@ -1,0 +1,130 @@
+---
+title: "Datos Hidrológicos"
+author: "Yustin Leiva"
+date: "23/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# **Proceso para cargar los datos del archivo csv al Rstudio**
+### En este flujo de trabajo se va a utilizar los datos de el río Banano y el río Estrella
+### El primer paso para este flujo de trabajo es crear un nuevo archivo en el entorno de R studio, el cual vamos a guardar en una carpeta en donde poseamos el archivo que en este caso lleva el nombre **FDC.csv**.
+ Para leer el archivo local que se posee se  utiliza el comando:
+
+
+```{r primer paso}
+inp <- read.csv("FDC.csv",na.strings="")
+head(inp)
+dim(inp)
+
+```
+
+### La mejor forma de comprobar si el archivo posee celdas **"na"** que son celdas vacías, es mediante la siguiente funcion:
+En caso de que posea celdas vacías se puede eliminar con: *newinp <- na.ommit(inp)* 
+
+```{r segundo paso, }
+inp[!complete.cases(inp),]
+```
+
+# **Creación de gráficos**
+### Utilizando la funcion **plot** se puede hacer un gráfico rapido, en este caso la variable del 2 se utiliza para identificar al río estrella, el **type=l** es para que el grafico se manifieste en forma de linea y **col** nos permite darle el color.
+### La función **lines** se utiliza para agregar otra variable en este caso el 3, como rio banano.
+
+```{r tercer paso, }
+plot(inp[,2], type="l", col="blue")
+lines(inp[,3], col="green")
+```
+
+### De la siguiente manera se puede obtener el mínimo y el máximo de los datos:
+
+```{r cuarto paso, }
+summary(inp[,2:3])
+
+```
+
+# **Visualización de un histograma**
+### Para visualizar un histograma es necesario utilizar la función **hist**, como se muestra a continuación:
+
+```{r quinto paso, }
+hist(inp[,2])
+
+```
+Histograma del Río Estrella
+```{r quintoo paso, }
+hist(inp[,3])
+
+```
+Histograma del Río Banano
+
+# **Nombrar las columnas del archivo**
+### Para nombrar las columnas se puede utilizar la funcion **names**, en este caso el 1 es la fecha, el 2 es el rio Estrella y el 3 el rio Banano.
+### La funcion **attach** en este caso se utiliza para hacer referencia al inp donde se encuentran en los archivos.
+### Como se aprecia en el ultimo gráfico se cambió el 2, por el nombre que se le asignó.
+```{r sexto paso, }
+names(inp) <- c("fecha", "Estrella", "Banano")
+attach(inp)
+plot(Estrella)
+```
+
+# **Definiendo formato de fecha**
+### Para definir el formato de fecha se utiliza la función **Tempdate**, se define el formato de fecha a uno más universal como es el de dias/meses/años
+
+```{r setimo paso, }
+Tempdate <- strptime(inp[,1], format="%d/%m/%Y")
+
+```
+
+# **Obteniendo datos de una fecha especifica**
+### Mediante el comando **tapply** se puede obtener el flujo del caudal del río Estrella y el río Banano entre los años 1973 a 1983.
+Ambos resultados se pueden exportar a un archivo mediante la función **write**
+```{r octavo paso, }
+MAQ_Estrella <- tapply(Estrella, format(Tempdate, format="%Y"),FUN=sum)
+MAQ_Banano <- tapply(Banano, format(Tempdate, format="%Y"),FUN=sum)
+write.csv(rbind(MAQ_Estrella,MAQ_Banano), file="MAQ.csv")
+```
+
+## Gráfico de comparación entre el Río Banano y el Río Estrella
+
+```{r noveno paso, }
+plot(MAQ_Banano, ylim=c(100,3000))
+lines(MAQ_Estrella, col=2)
+
+```
+
+
+### Por su lado para obtener el promedio mensual simplemente se sustituye la **Y** por la **M**, donde **Y** es year y **M** es month.
+
+```{r decimo paso, }
+MMQ_Banano <- tapply(Banano, format(Tempdate, format="%m"),FUN=sum)
+MMQ_Estrella <- tapply(Estrella, format(Tempdate, format="%m"),FUN=sum)
+
+```
+
+# **Análisis de coorrelación**
+
+### Usamos la funcion de corinp, luego utilizamos cor para definir el metodo que se va a utilizar, los cuales son **"person"** **"kendall"** **"spearman".**
+### En este caso se utilizara el de spearman.
+
+
+```{r undecimo paso, }
+
+corinp <- cor(inp[,2:3], method= "spearman")
+```
+
+### Para finalizar creamos un modelo que predice el caudal del Río Banano con relación al río Estrella.
+
+```{r duodecimo paso, }
+inp.lm <- lm(inp[,2] ~ inp[,3], data=inp)
+summary(inp.lm)
+
+```
+
+Visualizaremos los gráficos con plot.
+
+```{r ultimo  paso, }
+
+plot(inp.lm)
+
+```
